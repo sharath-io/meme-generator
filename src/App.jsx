@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 import logo from "./assets/logo.png"
 
@@ -9,11 +9,28 @@ function App() {
     imageUrl:"https://i.imgflip.com/1bij.jpg"
   });
 
+  const [allMemes,setAllMemes] = useState([]);
+
   const handleInputChange=(event) =>{
     const {value,name} = event.target
     setMeme(meme => ({...meme,[name]:value}))
   }
-  
+
+  const getImages = ()=>{
+    fetch("https://api.imgflip.com/get_memes")
+    .then(res => res.json())
+    .then(data => setAllMemes(data.data.memes))
+  }
+
+  const pickAnImage=() =>{
+    const random = Math.floor(Math.random()*allMemes.length);
+    setMeme(meme =>({...meme,imageUrl:allMemes[random].url}))
+  }
+
+  useEffect(()=>{
+    getImages();
+  },[])
+
   return (
     <>
       <div className="heading">
@@ -33,11 +50,11 @@ function App() {
         </label>
         </div>
 
-        <button>Get a new Meme Image 🖼️ </button>
+        <button onClick={pickAnImage}>Get a new Meme Image 🖼️ </button>
       </div> 
 
       <div className="meme">
-                <img src={meme.imageUrl}/>
+                <img src={meme.imageUrl} alt="generated meme"/>
                 <span className="top">{meme.topText}</span>
                 <span className="bottom">{meme.bottomText}</span>
       </div>
